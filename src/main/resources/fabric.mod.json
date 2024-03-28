@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "autofishing",
+	"version": "${version}",
+	"name": "autoFishing",
+	"description": "Automatically fishes for you!",
+	"authors": [
+		"konoechoda"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/autofishing/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.autofishing.AutoFishing"
+		],
+		"client": [
+			"com.autofishing.AutoFishingClient"
+		],
+		"fabric-datagen": [
+			"com.autofishing.AutoFishingDataGenerator"
+		]
+	},
+	"mixins": [
+		"autofishing.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.7",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
