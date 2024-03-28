@@ -1,0 +1,2 @@
+# AutoFishing
+MinecraftMod - Automatically fishes
