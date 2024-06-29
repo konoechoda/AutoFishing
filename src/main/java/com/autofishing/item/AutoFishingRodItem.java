@@ -52,20 +52,29 @@ public class AutoFishingRodItem extends Item implements Vanishable {
                             int hookCountdown = hookCountdownFishField.getInt(bobber);
 
                             if (hookCountdown > 0) {
-                                if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD)) {
-                                    itemStackRight.use(world, user, Hand.MAIN_HAND);
-                                    itemStackRight.use(serverWorld, playerEntity, Hand.MAIN_HAND);
-                                } else if (itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
-                                    itemStackLeft.use(world, user, Hand.OFF_HAND);
-                                    itemStackLeft.use(serverWorld, playerEntity, Hand.OFF_HAND);
+                                for (int i = 0; i < 2; i++) {
+                                    if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD)) {
+                                        itemStackRight.use(world, user, Hand.MAIN_HAND);
+                                        itemStackRight.use(serverWorld, playerEntity, Hand.MAIN_HAND);
+                                    } else if (itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
+                                        itemStackLeft.use(world, user, Hand.OFF_HAND);
+                                        itemStackLeft.use(serverWorld, playerEntity, Hand.OFF_HAND);
+                                    }
+                                    sleep(600); // 0.6 sec sleep time to prevent the hook from hooking the fish in the air
                                 }
                             }
-                        } catch (NoSuchFieldException | IllegalAccessException e) {
+                        } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
                             throw new RuntimeException(e);
                         }
 
                     }
+                    try {
+                        sleep(100); // 0.1 sec sleep time to prevent too fast click
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }else{
+                    // if the item is not auto fishing rod, then stop the thread.
                     return;
                 }
             }
@@ -87,14 +96,6 @@ public class AutoFishingRodItem extends Item implements Vanishable {
 
         if (user.isAlive()) {
 
-            if(user.fishHook != null) {
-                if (itemStackRight.isOf(Items.FISHING_ROD)) {
-                    itemStack.use(world, user, Hand.MAIN_HAND);
-                } else if (itemStackLeft.isOf(Items.FISHING_ROD)) {
-                    itemStack.use(world, user, Hand.OFF_HAND);
-                }
-            }
-
             if (itemStackRight.isOf(Items.FISHING_ROD)) {
                 itemStack.use(world, user, Hand.MAIN_HAND);
             } else if (itemStackLeft.isOf(Items.FISHING_ROD)) {
@@ -108,15 +109,6 @@ public class AutoFishingRodItem extends Item implements Vanishable {
                 if (!autoThread.isAlive()) {
                     autoThread = new AutoThread();
                     autoThread.start();
-                } else if (autoThread.isWaiting()) {
-                    autoThread.notify();
-                }
-            } else {
-                try {
-                    if (autoThread.isAlive())
-                        autoThread.wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
                 }
             }
         }

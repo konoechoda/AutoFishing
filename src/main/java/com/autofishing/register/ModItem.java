@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier;
 
 public class ModItem {
 
-    public static final Item AUTO_FISHING_ROD = registerItem("fishing_rod", new AutoFishingRodItem(new Item.Settings().maxDamage(64)));
+    public static final Item AUTO_FISHING_ROD = registerItem("auto_fishing_rod", new AutoFishingRodItem(new Item.Settings().maxDamage(64)));
 
 
     @SafeVarargs
