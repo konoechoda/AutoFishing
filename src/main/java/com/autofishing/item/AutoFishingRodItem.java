@@ -1,8 +1,6 @@
 package com.autofishing.item;
 
 import com.autofishing.register.ModItem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.*;
@@ -11,7 +9,6 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 
 public class AutoFishingRodItem extends Item implements Vanishable {
@@ -21,44 +18,43 @@ public class AutoFishingRodItem extends Item implements Vanishable {
     }
 
     static class AutoThread extends Thread {
+
+        World world;
+        PlayerEntity user;
+
+        public AutoThread() {
+
+        }
+
+        public AutoThread(World world, PlayerEntity user) {
+            this.world = world;
+            this.user = user;
+        }
+
         @Override
         public void run() {
             while (true) {
-                ClientPlayerEntity user = MinecraftClient.getInstance().player;
-                if (user == null) {
+                if(user == null || world == null){
                     return;
                 }
-                World world = MinecraftClient.getInstance().world;
-                if (world == null) {
-                    return;
-                }
-                World serverWorld = Objects.requireNonNull(MinecraftClient.getInstance().getServer()).getWorld(world.getRegistryKey());
-                if(serverWorld == null){
-                    return;
-                }
-                PlayerEntity playerEntity = serverWorld.getPlayerByUuid(user.getUuid());
-                if(playerEntity == null){
-                    return;
-                }
-                ItemStack itemStackRight = playerEntity.getMainHandStack();
-                ItemStack itemStackLeft = playerEntity.getOffHandStack();
+                ItemStack itemStackRight = user.getMainHandStack();
+                ItemStack itemStackLeft = user.getOffHandStack();
                 if(itemStackRight.isOf(ModItem.AUTO_FISHING_ROD) || itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
-                    if (playerEntity.fishHook != null) {
-                        FishingBobberEntity bobber = playerEntity.fishHook;
+                    if (user.fishHook != null) {
+                        FishingBobberEntity bobber = user.fishHook;
                         try {
                             // it's private field. so I need to use reflection to get it. but it's not recommended.
                             Field hookCountdownFishField = FishingBobberEntity.class.getDeclaredField("hookCountdown");
                             hookCountdownFishField.setAccessible(true);
+
                             int hookCountdown = hookCountdownFishField.getInt(bobber);
 
                             if (hookCountdown > 0) {
                                 for (int i = 0; i < 2; i++) {
                                     if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD)) {
                                         itemStackRight.use(world, user, Hand.MAIN_HAND);
-                                        itemStackRight.use(serverWorld, playerEntity, Hand.MAIN_HAND);
                                     } else if (itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
                                         itemStackLeft.use(world, user, Hand.OFF_HAND);
-                                        itemStackLeft.use(serverWorld, playerEntity, Hand.OFF_HAND);
                                     }
                                     sleep(600); // 0.6 sec sleep time to prevent the hook from hooking the fish in the air
                                 }
@@ -86,6 +82,7 @@ public class AutoFishingRodItem extends Item implements Vanishable {
     }
 
     AutoThread autoThread = new AutoThread();
+    AutoThread autoThreadService = new AutoThread();
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
@@ -101,14 +98,19 @@ public class AutoFishingRodItem extends Item implements Vanishable {
             } else if (itemStackLeft.isOf(Items.FISHING_ROD)) {
                 itemStack.use(world, user, Hand.OFF_HAND);
             }
-
-            if (!world.isClient()) {
-                return TypedActionResult.success(itemStack, world.isClient());
-            }
-            if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD) || itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
-                if (!autoThread.isAlive()) {
-                    autoThread = new AutoThread();
-                    autoThread.start();
+            if(!world.isClient()){
+                if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD) || itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
+                    if (!autoThreadService.isAlive()) {
+                        autoThreadService = new AutoThread(world, user);
+                        autoThreadService.start();
+                    }
+                }
+            }else {
+                if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD) || itemStackLeft.isOf(ModItem.AUTO_FISHING_ROD)) {
+                    if (!autoThread.isAlive()) {
+                        autoThread = new AutoThread(world, user);
+                        autoThread.start();
+                    }
                 }
             }
         }
