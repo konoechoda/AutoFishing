@@ -21,6 +21,6 @@ public class AutoFishing implements ModInitializer {
 
 		ModItem.registerModItems();
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("Hello From AutoFishMod!");
 	}
 }

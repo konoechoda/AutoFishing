@@ -1,5 +1,6 @@
 package com.autofishing.item;
 
+import com.autofishing.mixin.FishingBobberEntityMixin;
 import com.autofishing.register.ModItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
@@ -43,12 +44,7 @@ public class AutoFishingRodItem extends Item implements Vanishable {
                     if (user.fishHook != null) {
                         FishingBobberEntity bobber = user.fishHook;
                         try {
-                            // it's private field. so I need to use reflection to get it. but it's not recommended.
-                            Field hookCountdownFishField = FishingBobberEntity.class.getDeclaredField("hookCountdown");
-                            hookCountdownFishField.setAccessible(true);
-
-                            int hookCountdown = hookCountdownFishField.getInt(bobber);
-
+                            int hookCountdown =  ((FishingBobberEntityMixin) bobber).getHookCountdown();
                             if (hookCountdown > 0) {
                                 for (int i = 0; i < 2; i++) {
                                     if (itemStackRight.isOf(ModItem.AUTO_FISHING_ROD)) {
@@ -59,7 +55,7 @@ public class AutoFishingRodItem extends Item implements Vanishable {
                                     sleep(600); // 0.6 sec sleep time to prevent the hook from hooking the fish in the air
                                 }
                             }
-                        } catch (NoSuchFieldException | IllegalAccessException | InterruptedException e) {
+                        } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
 
