@@ -1,8 +1,8 @@
 # AutoFishing
 MinecraftMod(1.20.4) - Automatically fishes
 ## How to use
-Place the Auto fish rod in your main hand and the fish rod in your off hand.
-Then right click to start fishing.
-![img.png](img/img.png)
+Enchantment: Auto Fishing Enchantment
+Level 1: automatically catch fish
+Level 2: automatically catch fish and cast the rod again
 
 > tip: A small and interesting mod I wrote for personal learning.
