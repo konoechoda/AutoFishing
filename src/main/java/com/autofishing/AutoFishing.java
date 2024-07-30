@@ -1,5 +1,6 @@
 package com.autofishing;
 
+import com.autofishing.register.ModEnchantments;
 import com.autofishing.register.ModItem;
 import net.fabricmc.api.ModInitializer;
 
@@ -19,7 +20,8 @@ public class AutoFishing implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		ModItem.registerModItems();
+		//ModItem.registerModItems();
+		ModEnchantments.registerModEnchantments();
 
 		LOGGER.info("Hello From AutoFishMod!");
 	}
